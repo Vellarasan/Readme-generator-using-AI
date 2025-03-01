@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Readme File Generator
+  main:
+    banner-mode: "off"
+  ai:
+    chat:
+      client:
+        enabled: true
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+
+github:
+  token: ${GITHUB_TOKEN}
