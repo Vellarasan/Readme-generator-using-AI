@@ -7,6 +7,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Service class for interacting with GitHub API and downloading repository contents.
  * This service allows downloading specified file types from a GitHub repository,
@@ -15,6 +18,7 @@ import org.springframework.web.client.RestClient;
 @Service
 public class GitHubService {
 
+    public static final String GITHUB_BASE_URL = "https://api.github.com";
     private final RestClient restClient;
     private final GitHubConfig config;
 
@@ -28,7 +32,7 @@ public class GitHubService {
                          GitHubConfig config) {
         this.config = config;
         this.restClient = builder
-                .baseUrl("https://api.github.com")
+                .baseUrl(GITHUB_BASE_URL)
                 .defaultHeader("Accept", "application/vnd.github+json")
                 .defaultHeader("X-GitHub-Api-Version", "2022-11-28")
                 .defaultHeader("Authorization", "Bearer " + config.token())  // Remove the colon after Bearer
@@ -51,5 +55,19 @@ public class GitHubService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
                 });
+    }
+
+    public List<String> getCommitMessages(String owner, String repo) {
+
+        List<Commit> commits = restClient.get()
+                .uri("/repos/{owner}/{repo}/commits", owner, repo)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+
+        // Return the list of commit message alone
+        return commits != null ? commits.stream()
+                .map(eachCommit -> eachCommit.commit().message())
+                .toList() : Collections.emptyList();
     }
 }

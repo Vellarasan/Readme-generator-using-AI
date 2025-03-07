@@ -5,6 +5,7 @@ import io.vels.readme.generator.dtos.DiffEntry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +17,9 @@ public class ReadmeGeneratorService {
 
     @Value("classpath:/prompts/analyze-generate-commit-difference.st")
     private String genCommitDiffMsgPromptTemplateUri;
+
+    @Value("classpath:/prompts/generate-consolidated-feature-bug-fix-list-from-all-commit-message.st")
+    private String genConsolidatedChangesFromAllCommits;
 
 
     public ReadmeGeneratorService(AiClientService aiClientService, GitHubService gitHubService) {
@@ -33,5 +37,14 @@ public class ReadmeGeneratorService {
 
         // Invoke the AI
         return aiClientService.generatePrompt(genCommitDiffMsgPromptTemplateUri, patches);
+    }
+
+    public String generateFromAllCommits(String owner, String repo) {
+
+        // Get the list of commit messages from GitHub
+        List<String> commitMessages = gitHubService.getCommitMessages(owner, repo);
+
+        // Invoke the AI
+        return aiClientService.generatePrompt(genConsolidatedChangesFromAllCommits, commitMessages.toString());
     }
 }

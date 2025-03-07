@@ -23,4 +23,10 @@ public class ReadmeGeneratorController {
         return readmeGeneratorService.generateFromCommit(owner, repo, commitId);
     }
 
+    @GetMapping("/commit/{owner}/{repo}/commits")
+    String generateFromAllCommits(@PathVariable(value = "owner") String owner,
+                                  @PathVariable(value = "repo") String repo) {
+        return readmeGeneratorService.generateFromAllCommits(owner, repo);
+    }
+
 }
